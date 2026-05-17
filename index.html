@@ -56,7 +56,7 @@ nav{
   display:flex;align-items:center;
   padding:0 2rem;height:54px;gap:1.5rem;
 }
-.nav-logo{font-weight:800;font-size:0.92rem;color:var(--blue);margin-right:auto;letter-spacing:-0.01em;}
+.nav-logo{font-weight:800;font-size:0.92rem;color:var(--blue);margin-right:auto;letter-spacing:-0.01em;text-decoration:none;}
 nav a{color:var(--text-dim);text-decoration:none;font-size:0.82rem;transition:color 0.2s;}
 nav a:hover{color:var(--text);}
 nav a.active{color:var(--purple);}
@@ -345,11 +345,10 @@ footer a:hover{text-decoration:underline;}
 <body>
 
 <nav>
-  <span class="nav-logo">LNPRJ</span>
+  <a class="nav-logo" href="https://lnprj.neillin-lct.workers.dev">LNPRJ</a>
   <a href="https://lnprj.neillin-lct.workers.dev">索引</a>
-  <a href="https://japanese-grammar.neillin-lct.workers.dev">01 日語文法</a>
-  <a href="https://ganyu.neillin-lct.workers.dev">02 趕魚</a>
-  <a href="#" class="active">03 工作流整合</a>
+  <div id="ln-nav-items" style="display:contents;"></div>
+  <!-- 動態插入其他作品連結，當前頁 03 標記 active -->
 </nav>
 
 <section id="hero">
@@ -608,6 +607,23 @@ footer a:hover{text-decoration:underline;}
 </div>
 
 <script>
+/* ===== DYNAMIC NAV ===== */
+fetch('https://lnprj.neillin-lct.workers.dev/projects.json')
+  .then(r => r.json())
+  .then(list => {
+    const container = document.getElementById('ln-nav-items');
+    container.innerHTML = list.map(p =>
+      `<a href="${p.url}"${p.id === '03' ? ' class="active"' : ''}>${p.id} ${p.title}</a>`
+    ).join('');
+  })
+  .catch(() => {
+    // fallback: show static links if fetch fails
+    document.getElementById('ln-nav-items').innerHTML =
+      `<a href="https://japanese-grammar.neillin-lct.workers.dev">01 日語文法</a>
+       <a href="https://ganyu.neillin-lct.workers.dev">02 趕魚</a>
+       <a href="#" class="active">03 工作流整合</a>`;
+  });
+
 /* ===== NODE INFO ===== */
 const nodeData = {
   user:  { tag:'用戶', title:'Neil（你）', desc:'所有動作的起點。你用自然語言下指令——「整理今天重點」或「找今晚好看的電影」。你完全掌控授權範圍與執行邊界。' },
@@ -628,17 +644,16 @@ function nodeClick(id) {
 }
 
 /* ===== CONNECTIONS ===== */
-// Edges: [from-id, to-id]
 const EDGES = [
-  ['nn-user',  'nn-claude'],  // 0
-  ['nn-claude','nn-conf'],    // 1
-  ['nn-claude','nn-gmail'],   // 2
-  ['nn-claude','nn-slack'],   // 3
-  ['nn-claude','nn-tmdb'],    // 4
-  ['nn-conf',  'nn-out'],     // 5
-  ['nn-gmail', 'nn-out'],     // 6
-  ['nn-slack', 'nn-out'],     // 7
-  ['nn-tmdb',  'nn-out'],     // 8
+  ['nn-user',  'nn-claude'],
+  ['nn-claude','nn-conf'],
+  ['nn-claude','nn-gmail'],
+  ['nn-claude','nn-slack'],
+  ['nn-claude','nn-tmdb'],
+  ['nn-conf',  'nn-out'],
+  ['nn-gmail', 'nn-out'],
+  ['nn-slack', 'nn-out'],
+  ['nn-tmdb',  'nn-out'],
 ];
 const EDGE_COLORS = ['#a78bfa','#4f9eff','#fb923c','#34d399','#f59e0b','#4f9eff','#fb923c','#34d399','#f59e0b'];
 
@@ -874,7 +889,6 @@ const TEXT_OUTPUTS = {
 共 12 封未讀 · 過濾訂閱 23 封`,
 };
 
-// Movie output is HTML (with real links)
 function movieOutputHTML() {
   const movies = [
     {
@@ -882,7 +896,6 @@ function movieOutputHTML() {
       meta: '⭐ 7.8 · 🍅 96% · 動作/冒險 · 169 分鐘 · 英語',
       quote: '「湯姆克魯斯的謝幕之作，特技場面令人窒息——最後一跳值回票價」',
       tmdbId: '575265',
-      imdbId: 'tt9603212',
       fandango: 'https://www.fandango.com/search?q=mission+impossible+final+reckoning',
       amc: 'https://www.amctheatres.com/movies',
       imax: 'https://www.imax.com/movies',
@@ -892,7 +905,6 @@ function movieOutputHTML() {
       meta: '⭐ 7.3 · 🍅 84% · 家庭/奇幻 · 108 分鐘 · 英語',
       quote: '「比想像中忠實原著，夏威夷取景美不勝收，親子同樂首選」',
       tmdbId: '1084736',
-      imdbId: 'tt3861390',
       fandango: 'https://www.fandango.com/search?q=lilo+and+stitch+2025',
       amc: 'https://www.amctheatres.com/movies',
       imax: null,
@@ -902,7 +914,6 @@ function movieOutputHTML() {
       meta: '⭐ 8.1 · 🍅 99% · 劇情/驚悚 · 137 分鐘 · 英語',
       quote: '「Ryan Coogler 年度最佳——融合藍調、歷史與恐怖的天才之作」',
       tmdbId: '1233069',
-      imdbId: 'tt31806037',
       fandango: 'https://www.fandango.com/search?q=sinners+2025',
       amc: 'https://www.amctheatres.com/movies',
       imax: 'https://www.imax.com/movies',
